@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Apoorva Jaliminchi — Data Analytics & ML</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e17;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --accent: #6ee7f7;
+    --accent2: #a78bfa;
+    --accent3: #34d399;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --border: rgba(110,231,247,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+  /* ── CANVAS BG ── */
+  #canvas-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.35;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 5vw;
+    background: rgba(10,14,23,0.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'DM Mono', monospace;
+    color: var(--accent);
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.2s;
+    letter-spacing: 0.04em;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ── SECTIONS ── */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 6rem 5vw;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 8rem;
+    max-width: 100%;
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+
+  .hero-inner { max-width: 900px; margin: 0 auto; width: 100%; }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.2s forwards;
+  }
+
+  h1.hero-name {
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    font-weight: 700;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.4s forwards;
+  }
+
+  h1.hero-name .line2 {
+    display: block;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-tagline {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    color: var(--muted);
+    max-width: 560px;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.6s forwards;
+    font-weight: 400;
+  }
+
+  .hero-ctas {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.8s forwards;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    padding: 0.75rem 1.8rem;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(110,231,247,0.3); }
+
+  .btn-secondary {
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.75rem 1.8rem;
+    border-radius: 6px;
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    opacity: 0;
+    animation: fadeIn 1s 1.4s forwards;
+  }
+  .scroll-indicator span { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; font-family: 'DM Mono', monospace; }
+  .scroll-line { width: 1px; height: 50px; background: linear-gradient(to bottom, var(--accent), transparent); animation: scrollPulse 1.8s ease-in-out infinite; }
+
+  /* ── SECTION HEADERS ── */
+  .sec-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  .sec-title {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 3rem;
+    line-height: 1.1;
+  }
+
+  /* ── SKILLS ── */
+  .skill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .skill-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  .skill-card.visible { opacity: 1; transform: translateY(0); }
+  .skill-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 8px 32px rgba(110,231,247,0.08);
+  }
+
+  .skill-card-icon { font-size: 1.6rem; margin-bottom: 0.75rem; }
+  .skill-card-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.75rem; }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    background: rgba(110,231,247,0.08);
+    color: var(--accent);
+    border: 1px solid rgba(110,231,247,0.15);
+  }
+  .tag.purple { background: rgba(167,139,250,0.08); color: var(--accent2); border-color: rgba(167,139,250,0.15); }
+  .tag.green { background: rgba(52,211,153,0.08); color: var(--accent3); border-color: rgba(52,211,153,0.15); }
+
+  /* ── PROJECTS ── */
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.75rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s, border-color 0.25s;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  .project-card.visible { opacity: 1; transform: translateY(0); }
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+  .project-card:hover::before { transform: scaleX(1); }
+  .project-card:hover { transform: translateY(-4px); border-color: rgba(110,231,247,0.25); }
+
+  .project-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    letter-spacing: 0.1em;
+  }
+  .project-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.6rem; }
+  .project-desc { font-size: 0.875rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.25rem; }
+  .project-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: gap 0.2s;
+  }
+  .project-link:hover { gap: 0.6rem; }
+
+  /* ── STAT BAR ── */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 5rem;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.3s forwards;
+  }
+
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    text-align: center;
+  }
+  .stat-num { font-size: 2rem; font-weight: 700; color: var(--accent); }
+  .stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; letter-spacing: 0.05em; }
+
+  /* ── CONTACT ── */
+  .contact-inner {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .contact-heading { font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+  .contact-sub { color: var(--muted); font-size: 0.9rem; }
+
+  .contact-links { display: flex; flex-direction: column; gap: 1rem; }
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1.2rem;
+    background: var(--surface2);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.875rem;
+    transition: background 0.2s, color 0.2s;
+    border: 1px solid var(--border);
+  }
+  .contact-item:hover { background: rgba(110,231,247,0.07); color: var(--accent); border-color: rgba(110,231,247,0.2); }
+  .contact-item-icon { font-size: 1.1rem; }
+  .contact-item-text { font-weight: 500; }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin: 0 auto;
+    max-width: 1100px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  @keyframes scrollPulse { 0%,100% { opacity:0.3; } 50% { opacity:1; } }
+
+  /* transition for reveal cards */
+  .skill-card, .project-card {
+    transition: opacity 0.5s, transform 0.5s, border-color 0.25s, box-shadow 0.25s;
+  }
+
+  @media (max-width: 700px) {
+    .contact-inner { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .project-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas-bg"></canvas>
+
+<nav>
+  <span class="nav-logo">AJ<span style="color:var(--muted)">_portfolio</span></span>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div id="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">📍 Bhopal, Madhya Pradesh · BCA Student</p>
+    <h1 class="hero-name">
+      Apoorva
+      <span class="line2">Jaliminchi</span>
+    </h1>
+    <p class="hero-tagline">Data Analytics &amp; ML learner turning raw datasets into stories that matter. Python · SQL · Power BI · Excel.</p>
+    <div class="hero-ctas">
+      <a href="#projects" class="btn-primary">View Projects</a>
+      <a href="https://github.com/apoorva-16-2006" target="_blank" class="btn-secondary">GitHub ↗</a>
+      <a href="https://www.linkedin.com/in/apoorva-jaliminchi-b404b5331" target="_blank" class="btn-secondary">LinkedIn ↗</a>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</div>
+
+<!-- ABOUT STATS -->
+<div class="divider"></div>
+<section id="about">
+  <p class="sec-label">About me</p>
+  <h2 class="sec-title">Always learning,<br>always building.</h2>
+  <div class="stat-row">
+    <div class="stat-box"><div class="stat-num">9</div><div class="stat-label">GitHub Repos</div></div>
+    <div class="stat-box"><div class="stat-num">500+</div><div class="stat-label">LinkedIn Connections</div></div>
+    <div class="stat-box"><div class="stat-num">5+</div><div class="stat-label">Tech Domains</div></div>
+    <div class="stat-box"><div class="stat-num">2026</div><div class="stat-label">Goals In Progress</div></div>
+  </div>
+  <p style="color:var(--muted); max-width:640px; font-size:1.0rem; line-height:1.8;">
+    I'm a BCA student at <strong style="color:var(--text)">LNCT Group of Colleges</strong> with a deep interest in data analytics and machine learning. I love exploring datasets, building dashboards, and turning messy numbers into meaningful insights. Currently building end-to-end data pipelines and sharpening my DSA skills for the real world.
+  </p>
+</section>
+
+<!-- SKILLS -->
+<div class="divider"></div>
+<section id="skills">
+  <p class="sec-label">Tech Stack</p>
+  <h2 class="sec-title">Tools of the trade.</h2>
+  <div class="skill-grid">
+    <div class="skill-card">
+      <div class="skill-card-icon">🐍</div>
+      <div class="skill-card-title">Programming Languages</div>
+      <p style="font-size:0.82rem;color:var(--muted)">Core languages I work and experiment with daily.</p>
+      <div class="skill-tags">
+        <span class="tag">Python</span>
+        <span class="tag">C</span>
+        <span class="tag">C++</span>
+        <span class="tag">R</span>
+        <span class="tag">SQL</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-card-icon">📊</div>
+      <div class="skill-card-title">Data Analytics</div>
+      <p style="font-size:0.82rem;color:var(--muted)">Libraries for crunching, cleaning, and visualising data.</p>
+      <div class="skill-tags">
+        <span class="tag purple">NumPy</span>
+        <span class="tag purple">Pandas</span>
+        <span class="tag purple">Matplotlib</span>
+        <span class="tag purple">Seaborn</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-card-icon">📈</div>
+      <div class="skill-card-title">BI &amp; Reporting</div>
+      <p style="font-size:0.82rem;color:var(--muted)">Building interactive dashboards and business reports.</p>
+      <div class="skill-tags">
+        <span class="tag green">Power BI</span>
+        <span class="tag green">Excel</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-card-icon">⚙️</div>
+      <div class="skill-card-title">Dev Tools</div>
+      <p style="font-size:0.82rem;color:var(--muted)">Version control and development workflow.</p>
+      <div class="skill-tags">
+        <span class="tag">Git</span>
+        <span class="tag">GitHub</span>
+        <span class="tag">Jupyter</span>
+        <span class="tag">Streamlit</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-card-icon">🧠</div>
+      <div class="skill-card-title">Currently Exploring</div>
+      <p style="font-size:0.82rem;color:var(--muted)">Active learning areas for 2025–2026.</p>
+      <div class="skill-tags">
+        <span class="tag purple">ML Fundamentals</span>
+        <span class="tag purple">DSA</span>
+        <span class="tag purple">Flask</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-card-icon">🗄️</div>
+      <div class="skill-card-title">Data Management</div>
+      <p style="font-size:0.82rem;color:var(--muted)">Working with databases and structured data.</p>
+      <div class="skill-tags">
+        <span class="tag green">SQL</span>
+        <span class="tag green">Database Design</span>
+        <span class="tag green">Data Cleaning</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<div class="divider"></div>
+<section id="projects">
+  <p class="sec-label">Featured Work</p>
+  <h2 class="sec-title">Projects I've built.</h2>
+  <div class="project-grid">
+    <div class="project-card">
+      <div class="project-num">01 — Python · Streamlit</div>
+      <div class="project-title">Expense Tracker AI</div>
+      <p class="project-desc">A Streamlit-based expense management app that lets users record, upload, view, and analyse expenses. Features interactive charts, category-wise breakdown, and monthly reporting.</p>
+      <div class="skill-tags" style="margin-bottom:1rem">
+        <span class="tag">Python</span><span class="tag">Streamlit</span><span class="tag purple">Data Viz</span>
+      </div>
+      <a href="https://github.com/apoorva-16-2006/expense_tracker_ai" target="_blank" class="project-link">View on GitHub →</a>
+    </div>
+    <div class="project-card">
+      <div class="project-num">02 — Python · Pandas · Seaborn</div>
+      <div class="project-title">Student Performance Analysis</div>
+      <p class="project-desc">Comprehensive data analysis exploring factors influencing student outcomes — study habits, attendance, sleep, and motivation — using Python, Pandas, and Seaborn visualisations.</p>
+      <div class="skill-tags" style="margin-bottom:1rem">
+        <span class="tag purple">Pandas</span><span class="tag purple">Seaborn</span><span class="tag">Jupyter</span>
+      </div>
+      <a href="https://github.com/apoorva-16-2006/Student-Performance-Analysis" target="_blank" class="project-link">View on GitHub →</a>
+    </div>
+    <div class="project-card">
+      <div class="project-num">03 — Power BI</div>
+      <div class="project-title">Power BI Dashboard Collection</div>
+      <p class="project-desc">A collection of interactive Power BI dashboards across sales, e-commerce, and analytics domains. Showcases data modelling, cleaning, and business insight storytelling.</p>
+      <div class="skill-tags" style="margin-bottom:1rem">
+        <span class="tag green">Power BI</span><span class="tag green">DAX</span><span class="tag green">Data Modelling</span>
+      </div>
+      <a href="https://github.com/apoorva-16-2006/POWER-BI-DASHBOARD" target="_blank" class="project-link">View on GitHub →</a>
+    </div>
+    <div class="project-card">
+      <div class="project-num">04 — Microsoft Excel</div>
+      <div class="project-title">Supermart Grocery Sales Dashboard</div>
+      <p class="project-desc">Interactive Excel dashboard analysing grocery sales, profit, and discount trends across product categories and regions — built entirely within Excel with dynamic charts.</p>
+      <div class="skill-tags" style="margin-bottom:1rem">
+        <span class="tag green">Excel</span><span class="tag green">Pivot Tables</span><span class="tag green">Charts</span>
+      </div>
+      <a href="https://github.com/apoorva-16-2006/EXCEL-DASHBOARD" target="_blank" class="project-link">View on GitHub →</a>
+    </div>
+    <div class="project-card">
+      <div class="project-num">05 — Flask · Python · HTML</div>
+      <div class="project-title">Book Recommendation System</div>
+      <p class="project-desc">Flask web app displaying the top 50 popular books and suggesting similar titles using collaborative filtering. Two-section interface — popularity-based and similarity-based.</p>
+      <div class="skill-tags" style="margin-bottom:1rem">
+        <span class="tag">Flask</span><span class="tag purple">Collaborative Filtering</span><span class="tag">HTML</span>
+      </div>
+      <a href="https://github.com/apoorva-16-2006/BOOK-RECOMMENDATION-SYSTEM-" target="_blank" class="project-link">View on GitHub →</a>
+    </div>
+    <div class="project-card">
+      <div class="project-num">06 — In Progress</div>
+      <div class="project-title">Data Analytics Portfolio Pipeline</div>
+      <p class="project-desc">End-to-end data pipeline using Python, SQL, and Power BI — from raw dataset ingestion to structured dashboards. Focuses on real-world analytical workflows.</p>
+      <div class="skill-tags" style="margin-bottom:1rem">
+        <span class="tag">Python</span><span class="tag">SQL</span><span class="tag green">Power BI</span>
+      </div>
+      <a href="https://github.com/apoorva-16-2006" target="_blank" class="project-link">Follow progress →</a>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<div class="divider"></div>
+<section id="contact">
+  <p class="sec-label">Get in touch</p>
+  <div class="contact-inner">
+    <div>
+      <h2 class="contact-heading">Let's connect<br>&amp; collaborate.</h2>
+      <p class="contact-sub">Open to internships, collaborative data projects, and learning opportunities. Don't hesitate to reach out!</p>
+    </div>
+    <div class="contact-links">
+      <a href="mailto:jaliminchiapoorva@gmail.com" class="contact-item">
+        <span class="contact-item-icon">✉️</span>
+        <span class="contact-item-text">jaliminchiapoorva@gmail.com</span>
+      </a>
+      <a href="https://www.linkedin.com/in/apoorva-jaliminchi-b404b5331" target="_blank" class="contact-item">
+        <span class="contact-item-icon">💼</span>
+        <span class="contact-item-text">linkedin.com/in/apoorva-jaliminchi</span>
+      </a>
+      <a href="https://github.com/apoorva-16-2006" target="_blank" class="contact-item">
+        <span class="contact-item-icon">🐙</span>
+        <span class="contact-item-text">github.com/apoorva-16-2006</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>⭐ apoorva jaliminchi — always learning, always building · 2026</span>
+</footer>
+
+<script>
+/* ── CANVAS PARTICLE NETWORK ── */
+const canvas = document.getElementById('canvas-bg');
+const ctx = canvas.getContext('2d');
+let W, H, pts;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+function initPts() {
+  pts = Array.from({ length: 60 }, () => ({
+    x: Math.random() * W, y: Math.random() * H,
+    vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35,
+    r: Math.random() * 1.5 + 0.5
+  }));
+}
+
+function drawNetwork() {
+  ctx.clearRect(0, 0, W, H);
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i];
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0 || p.x > W) p.vx *= -1;
+    if (p.y < 0 || p.y > H) p.vy *= -1;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = '#6ee7f7';
+    ctx.fill();
+    for (let j = i + 1; j < pts.length; j++) {
+      const q = pts[j];
+      const dx = p.x - q.x, dy = p.y - q.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 140) {
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(q.x, q.y);
+        ctx.strokeStyle = `rgba(110,231,247,${0.12 * (1 - dist/140)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(drawNetwork);
+}
+
+window.addEventListener('resize', () => { resize(); initPts(); });
+resize(); initPts(); drawNetwork();
+
+/* ── SCROLL REVEAL ── */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.skill-card, .project-card').forEach(el => observer.observe(el));
+
+/* ── TYPED CURSOR in hero eyebrow ── */
+const eyebrow = document.querySelector('.hero-eyebrow');
+const fullText = eyebrow.textContent;
+eyebrow.textContent = '';
+let ci = 0;
+const typeInterval = setInterval(() => {
+  if (ci < fullText.length) {
+    eyebrow.textContent += fullText[ci++];
+  } else {
+    clearInterval(typeInterval);
+  }
+}, 38);
+</script>
+</body>
+</html>
